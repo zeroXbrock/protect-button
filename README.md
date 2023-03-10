@@ -21,7 +21,7 @@ Run demo:
 
 ```sh
 cd web-demo
-yarn install && yarn start
+npm install && npm start
 cd ..
 ```
 
