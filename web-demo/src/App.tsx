@@ -17,7 +17,6 @@ function App() {
         {status === 'connected' && (<>
           <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
           <ProtectButton addChain={addChain} chainId={5}>Connect to Protect (Goerli)</ProtectButton>
-          <ProtectButton addChain={addChain} chainId={11155111}>Connect to Protect (Sepolia)</ProtectButton>
         </>)}
       </header>
     </div>
