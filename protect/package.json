@@ -26,6 +26,6 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"no test specified\"",
-    "release": "release-it"
+    "release": "echo \"run the following:\nnpx release-it\""
   }
 }
