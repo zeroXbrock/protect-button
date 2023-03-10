@@ -1,0 +1,66 @@
+# Connect to Protect
+
+A button that connects Metamask to Flashbots Protect when clicked.
+
+## Requirements
+
+The component expects a callback `addChain` given by `useMetaMask` from [metamask-react](https://www.npmjs.com/package/metamask-react) to handle the low-level connection to Metamask.
+
+## demo
+
+Build from source:
+
+```sh
+cd protect
+yarn install && yarn build
+cd ..
+```
+
+Run demo:
+
+```sh
+cd web-demo
+yarn install && yarn start
+cd ..
+```
+
+## using in your library
+
+Import compiled lib (npm soon):
+
+```sh
+yarn add ../protect-button
+# or
+npm install ../protect-button
+```
+
+In a React file (tsx or jsx):
+
+```tsx
+import React from 'react'
+import './App.css'
+import { useMetaMask } from 'metamask-react'
+import ProtectButton from "protect-button"
+
+function App() {
+  const { status, connect, addChain } = useMetaMask()
+  return (
+    <div className="App">
+      <header className="App-header">
+        {status === 'notConnected' && (
+          <button onClick={connect}>Connect to MetaMask</button>
+        )}
+        {status !== 'connected' && status !== "notConnected" && (
+          <span>Connecting to MetaMask...</span>
+        )}
+        {status === 'connected' && (<>
+          <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
+          <ProtectButton addChain={addChain} chainId={5}>Connect to Protect (Goerli)</ProtectButton>
+        </>)}
+      </header>
+    </div>
+  );
+}
+
+export default App
+```
