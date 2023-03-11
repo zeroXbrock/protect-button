@@ -7,44 +7,6 @@ React component: a button that connects Metamask to Flashbots Protect when click
 * [react ^18](https://reactjs.org/)
 * [metamask-react](https://www.npmjs.com/package/metamask-react) - The component expects a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
 
-## demo
-
-Build from source:
-
-```sh
-cd protect
-yarn install && yarn build
-cd ..
-```
-
-Run demo:
-
-```sh
-cd web-demo
-npm install && npm start
-cd ..
-```
-
-## using in your library
-
-Install from npm:
-
-```sh
-yarn add protect-button
-# or
-npm i protect-button
-```
-
-Alternatively, if you built from source:
-
-```sh
-yarn add ../protect-button
-# or
-npm i ../protect-button
-```
-
-In a React file (tsx or jsx):
-
 ```tsx
 import React from 'react'
 import './App.css'
