@@ -27,12 +27,20 @@ cd ..
 
 ## using in your library
 
-Import compiled lib (npm soon):
+Install from npm:
+
+```sh
+yarn add protect-button
+# or
+npm i protect-button
+```
+
+Alternatively, if you built from source:
 
 ```sh
 yarn add ../protect-button
 # or
-npm install ../protect-button
+npm i ../protect-button
 ```
 
 In a React file (tsx or jsx):
