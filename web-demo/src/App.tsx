@@ -15,8 +15,10 @@ function App() {
           <span>Connecting to MetaMask...</span>
         )}
         {status === 'connected' && (<>
+          <ProtectButton>Connect to Protect (default params)</ProtectButton>
           <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
           <ProtectButton addChain={addChain} chainId={5}>Connect to Protect (Goerli)</ProtectButton>
+          <ProtectButton chainId={5}>Connect to Protect (Goerli) (RAW)</ProtectButton>
         </>)}
       </header>
     </div>
