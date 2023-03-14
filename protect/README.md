@@ -8,7 +8,7 @@ React component: a button that connects Metamask to Flashbots Protect when click
 
 ### OPTIONAL
 
-* [metamask-react](https://www.npmjs.com/package/metamask-react) - The component expects a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
+* [metamask-react](https://www.npmjs.com/package/metamask-react) - The component accepts a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
 
 ```tsx
 import React from 'react'

@@ -5,7 +5,10 @@ React component: a button that connects Metamask to Flashbots Protect when click
 ## Dependencies
 
 * [react ^18](https://reactjs.org/)
-* [metamask-react](https://www.npmjs.com/package/metamask-react) - The component expects a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
+
+### OPTIONAL
+
+* [metamask-react](https://www.npmjs.com/package/metamask-react) - The component accepts a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
 
 ## demo
 
@@ -64,7 +67,8 @@ function App() {
         )}
         {status === 'connected' && (<>
           <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
-          <ProtectButton addChain={addChain} chainId={5}>Connect to Protect (Goerli)</ProtectButton>
+          {/* addChain is optional; if ommited, will use `window.ethereum` */}
+          <ProtectButton chainId={5}>Connect to Protect (Goerli)</ProtectButton>
         </>)}
       </header>
     </div>
