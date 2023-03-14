@@ -10,6 +10,8 @@ React component: a button that connects Metamask to Flashbots Protect when click
 
 * [metamask-react](https://www.npmjs.com/package/metamask-react) - The component accepts a callback `addChain` given by `useMetaMask` from metamask-react to handle the low-level connection to Metamask.
 
+## Usage
+
 ```tsx
 <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
 ```
@@ -20,7 +22,7 @@ React component: a button that connects Metamask to Flashbots Protect when click
 <ProtectButton chainId={5}>Connect to Protect (Goerli)</ProtectButton>
 ```
 
-## Full example
+### Full example
 
 ```tsx
 import React from 'react'
