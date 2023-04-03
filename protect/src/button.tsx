@@ -3,6 +3,7 @@ import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 
 export interface ProtectButtonOptions extends PropsWithChildren {
   addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
+  auctionEnabled?: boolean, // whether to enable auction mode (default: true)
   bundleId?: string,  // id for iterative bundle-building (default: undefined)
   chainId?: number,   // chain to connect to (default: 1)
 }
@@ -10,14 +11,21 @@ export interface ProtectButtonOptions extends PropsWithChildren {
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addChain, bundleId, chainId, children}) => {
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addChain, auctionEnabled, bundleId, chainId, children}) => {
   const chainIdActual: number = chainId || 1
+  const auctionEnabledActual: boolean = auctionEnabled !== false
   const protectUrl =
     chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
     chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
     "https://rpc.flashbots.net"
-  const queryStr = bundleId ? `?bundle=${bundleId}` : ""
-  const rpcUrl = `${protectUrl}${queryStr}`
+  const rpcUrl = new URL(protectUrl)
+
+  if (!auctionEnabledActual) {
+    rpcUrl.searchParams.append("auction", "disabled")
+  }
+  if (bundleId) {
+    rpcUrl.searchParams.append("bundle", bundleId)
+  }
 
   const connectToProtect = async () => {
     const addChainParams = {
@@ -33,7 +41,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addCha
           symbol: "ETH",
           decimals: 18,
       },
-      rpcUrls: [rpcUrl],
+      rpcUrls: [rpcUrl.toString()],
     }
     if (addChain) {
       try {

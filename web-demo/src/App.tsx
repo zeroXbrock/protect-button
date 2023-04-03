@@ -5,6 +5,7 @@ import ProtectButton from "protect-button"
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
+  const [auctionEnabled, setAuctionEnabled] = React.useState(true)
   return (
     <div className="App">
       <header className="App-header">
@@ -15,10 +16,14 @@ function App() {
           <span>Connecting to MetaMask...</span>
         )}
         {status === 'connected' && (<>
-          <ProtectButton>Connect to Protect (default params)</ProtectButton>
-          <ProtectButton addChain={addChain} chainId={1}>Connect to Protect (Mainnet)</ProtectButton>
-          <ProtectButton addChain={addChain} chainId={5}>Connect to Protect (Goerli)</ProtectButton>
-          <ProtectButton chainId={5}>Connect to Protect (Goerli) (RAW)</ProtectButton>
+          <div style={{display: "flex", alignItems: "center"}}>
+            <label htmlFor='auction' style={{fontSize: 12}}>MEV-Share</label>
+            <input id='auction' type="checkbox" checked={auctionEnabled} onChange={(e) => {
+              setAuctionEnabled(e.target.checked)
+            }} />
+          </div>
+          <ProtectButton addChain={addChain} chainId={1} auctionEnabled={auctionEnabled}>Connect to Protect (Mainnet)</ProtectButton>
+          <ProtectButton addChain={addChain} chainId={5} auctionEnabled={auctionEnabled}>Connect to Protect (Goerli)</ProtectButton>
         </>)}
       </header>
     </div>
