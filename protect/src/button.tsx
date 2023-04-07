@@ -1,9 +1,25 @@
 import React, { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 
+type AuctionHints = {
+  calldata?: boolean,
+  contractAddress?: boolean,
+  functionSelector?: boolean,
+  logs?: boolean,
+}
+
+const mungeHints = (auctionHints: AuctionHints) => {
+  return {
+    calldata: auctionHints.calldata,
+    contract_address: auctionHints.contractAddress,
+    function_selector: auctionHints.functionSelector,
+    logs: auctionHints.logs,
+  }
+}
+
 export interface ProtectButtonOptions extends PropsWithChildren {
   addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
-  auctionEnabled?: boolean, // whether to enable auction mode (default: true)
+  auctionHints?: AuctionHints, // auction disabled unless this is passed
   bundleId?: string,  // id for iterative bundle-building (default: undefined)
   chainId?: number,   // chain to connect to (default: 1)
 }
@@ -11,17 +27,25 @@ export interface ProtectButtonOptions extends PropsWithChildren {
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addChain, auctionEnabled, bundleId, chainId, children}) => {
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addChain, auctionHints, bundleId, chainId, children}) => {
   const chainIdActual: number = chainId || 1
-  const auctionEnabledActual: boolean = auctionEnabled !== false
+  const auctionEnabledActual: boolean = auctionHints ?
+    Object.values(auctionHints).includes(true)
+    : false
   const protectUrl =
     chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
     chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
     "https://rpc.flashbots.net"
   const rpcUrl = new URL(protectUrl)
 
-  if (!auctionEnabledActual) {
-    rpcUrl.searchParams.append("auction", "disabled")
+  if (auctionEnabledActual && auctionHints) {
+    rpcUrl.searchParams.append("auction", "enabled")
+    for (const entry of Object.entries(mungeHints(auctionHints))) {
+      const [hintName, hintEnabled] = entry
+      if (hintEnabled) {
+        rpcUrl.searchParams.append("hint", hintName)
+      }
+    }
   }
   if (bundleId) {
     rpcUrl.searchParams.append("bundle", bundleId)

@@ -6,6 +6,8 @@ import ProtectButton from "protect-button"
 function App() {
   const { status, connect, addChain } = useMetaMask()
   const [auctionEnabled, setAuctionEnabled] = React.useState(true)
+  const hints = auctionEnabled ? {contractAddress: true, calldata: true, functionSelector: true, logs: true} : undefined
+
   return (
     <div className="App">
       <header className="App-header">
@@ -22,8 +24,8 @@ function App() {
               setAuctionEnabled(e.target.checked)
             }} />
           </div>
-          <ProtectButton addChain={addChain} chainId={1} auctionEnabled={auctionEnabled}>Connect to Protect (Mainnet)</ProtectButton>
-          <ProtectButton addChain={addChain} chainId={5} auctionEnabled={auctionEnabled}>Connect to Protect (Goerli)</ProtectButton>
+          <ProtectButton addChain={addChain} chainId={1} auctionHints={hints}>Connect to Protect (Mainnet)</ProtectButton>
+          <ProtectButton addChain={addChain} chainId={5} auctionHints={hints}>Connect to Protect (Goerli)</ProtectButton>
         </>)}
       </header>
     </div>
