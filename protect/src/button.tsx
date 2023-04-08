@@ -38,8 +38,8 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addCha
 
   if (auctionDisabled) {
     rpcUrl.searchParams.append("auction", "disabled")
-    
   } else if (auctionHints) {
+    rpcUrl.searchParams.append("auction", "enabled")
     for (const entry of Object.entries(mungeHints(auctionHints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
