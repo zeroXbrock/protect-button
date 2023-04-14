@@ -101,19 +101,20 @@ function App() {
           <span>Connecting to MetaMask...</span>
         )}
         {status === 'connected' && (<>
+          <h2>MEV-Share Settings</h2>
           <div style={{ display: "flex", alignItems: "stretch" }}>
             <Checkbox id='mevShareDisabled' label='MEV-Share Disabled' arrangement='vertical' checked={mevShareDisabled} onChange={setMevShareDisabled} />
             {!mevShareDisabled &&
               <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
             }
-            {showExperimental && !mevShareDisabled && <div className='vertical' style={{ display: "flex", alignItems: "flex-end" }}>
-              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} onChange={setCalldata} orientation='last' />
-              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} orientation='last' onChange={setContractAddress} />
-              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} orientation='last' onChange={setFunctionSelector} />
-              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} onChange={setLogs} orientation='last' />
+            {showExperimental && !mevShareDisabled && <div className='vertical' style={{ display: "flex", alignItems: "flex-start" }}>
+              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} onChange={setCalldata} orientation='first' />
+              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} orientation='first' onChange={setContractAddress} />
+              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
+              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} onChange={setLogs} orientation='first' />
             </div>}
           </div>
-          <div>
+          <div style={{ marginTop: 13 }}>
             <code>Hints: {(() => {
               const mungedHints = Object.entries(mungeHints() || {}).filter(([_, v]) => !!v).map(([k,]) => k)
               return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)

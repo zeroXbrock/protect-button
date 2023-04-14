@@ -49,7 +49,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-top: 2px;
+  padding-bottom: 8px;
 }
 
 .vertical {
@@ -64,4 +67,8 @@ button {
 
 * {
   font-size: 13px;
+}
+
+h2 {
+  font-size: 14px;
 }
