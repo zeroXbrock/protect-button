@@ -15,6 +15,7 @@ const mungeHints = (auctionHints: HintPreferences) => {
 export interface ProtectButtonOptions extends PropsWithChildren {
   addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
   auctionHints?: HintPreferences, // specify data to share; default is all but calldata
+  targetBuilders?: Array<string>,
   auctionDisabled?: boolean, // auction enabled unless this is passed
   bundleId?: string,  // id for iterative bundle-building (default: undefined)
   chainId?: number,   // chain to connect to (default: 1)
@@ -23,7 +24,7 @@ export interface ProtectButtonOptions extends PropsWithChildren {
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({ addChain, auctionHints, bundleId, chainId, children }) => {
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({ addChain, auctionHints, bundleId, chainId, children, targetBuilders }) => {
   const chainIdActual: number = chainId || 1
   const protectUrl =
     chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
@@ -42,6 +43,12 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({ addCh
 
   if (bundleId) {
     rpcUrl.searchParams.append("bundle", bundleId)
+  }
+
+  if (targetBuilders) {
+    for (const builder of targetBuilders) {
+      rpcUrl.searchParams.append("targetBuilder", builder)
+    }
   }
 
   const connectToProtect = async () => {
