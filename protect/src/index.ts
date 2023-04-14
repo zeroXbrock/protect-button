@@ -1,6 +1,6 @@
-import FlashbotsProtectButton, { ProtectButtonOptions } from './button'
+import FlashbotsProtectButton from './button'
 
-export {
-    ProtectButtonOptions
-}
+export { ProtectButtonOptions } from './button'
+export { HintPreferences } from "@flashbots/matchmaker-ts"
+
 export default FlashbotsProtectButton

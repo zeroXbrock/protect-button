@@ -2,21 +2,33 @@ import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/matchmaker-ts'
 
-const mungeHints = (auctionHints: HintPreferences) => {
-  return {
-    calldata: auctionHints.calldata,
-    contract_address: auctionHints.contractAddress,
-    function_selector: auctionHints.functionSelector,
-    logs: auctionHints.logs,
-    transaction_hash: true, // tx hash is always shared on Flashbots Matchmaker
-  }
+const mungeHints = (hints?: HintPreferences) => {
+  const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && !cur, true) : true
+  return hints ?
+    (allHintsFalse ?
+      { // mevshare disabled
+        transaction_hash: true
+      } :
+      { // experimental options
+        calldata: hints.calldata,
+        contract_address: hints.contractAddress,
+        function_selector: hints.functionSelector,
+        logs: hints.logs,
+        transaction_hash: true, // tx hash is always shared on Flashbots Matchmaker
+      })
+    : { /* Default (Stable) config; no params */ }
 }
 
 export interface ProtectButtonOptions extends PropsWithChildren {
-  addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
-  auctionHints?: HintPreferences, // specify data to share; default is all but calldata
-  bundleId?: string,  // id for iterative bundle-building (default: undefined)
-  chainId?: number,   // chain to connect to (default: 1)
+  /** Callback from useMetaMask() */
+  addChain?: (chain: AddEthereumChainParameter) => Promise<void>
+  /** Specify data to share; default is [Stable config](#TODO-link-to-docs) */
+  auctionHints?: HintPreferences,
+  /** ID for iterative bundle-building (default: undefined) */
+  bundleId?: string,
+  /** Chain to connect to (default: 1) */
+  chainId?: number,
+  /** Selected builders that are permitted to build blocks using the client's transactions. */
   targetBuilders?: Array<string>,
 }
 
