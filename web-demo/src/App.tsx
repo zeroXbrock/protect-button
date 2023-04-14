@@ -42,6 +42,14 @@ function App() {
         }
   }
 
+  const Checkbox = ({ label, id, checked, update, disabled }: { disabled?: boolean, label: string, id: string, checked: boolean, update: (val: boolean) => void }) => (
+    <div className="checkbox-context">
+      <label htmlFor={id} style={{ fontSize: 12 }}>{label}</label>
+      <input id={id} type="checkbox" checked={checked} disabled={disabled} onChange={(e) => {
+        update(e.target.checked)
+      }} />
+    </div>)
+
   return (
     <div className="App">
       <header className="App-header">
@@ -53,43 +61,15 @@ function App() {
         )}
         {status === 'connected' && (<>
           <div style={{ display: "flex", alignItems: "stretch" }}>
-            <div className="checkbox-context">
-              <label htmlFor='auction' style={{ fontSize: 12 }}>MEV-Share Disabled</label>
-              <input id='auction' type="checkbox" checked={mevShareDisabled} onChange={(e) => {
-                setMevShareDisabled(e.target.checked)
-              }} />
-            </div>
-            {!mevShareDisabled && <div className='checkbox-context'>
-              <label htmlFor='experimental' style={{ fontSize: 12 }}>Show Experimental Options</label>
-              <input id='experimental' type="checkbox" checked={showExperimental} onChange={(e) => {
-                setShowExperimental(e.target.checked)
-              }} />
-            </div>}
+            <Checkbox id='mevShareDisabled' label='MEV-Share Disabled' checked={mevShareDisabled} update={setMevShareDisabled} />
+            {!mevShareDisabled &&
+              <Checkbox id='experimental' label='Show Experimental Options' checked={showExperimental} update={setShowExperimental} />
+            }
             {showExperimental && !mevShareDisabled && <div>
-              <div className="checkbox-context">
-                <label htmlFor='calldata' style={{ fontSize: 12 }}>calldata</label>
-                <input disabled={mevShareDisabled} id='calldata' type="checkbox" checked={calldata} onChange={(e) => {
-                  setCalldata(e.target.checked)
-                }} />
-              </div>
-              <div className="checkbox-context">
-                <label htmlFor='contractAddress' style={{ fontSize: 12 }}>contract address</label>
-                <input disabled={mevShareDisabled} id='contractAddress' type="checkbox" checked={contractAddress} onChange={(e) => {
-                  setContractAddress(e.target.checked)
-                }} />
-              </div>
-              <div className="checkbox-context">
-                <label htmlFor='functionSelector' style={{ fontSize: 12 }}>function selector</label>
-                <input disabled={mevShareDisabled} id='functionSelector' type="checkbox" checked={functionSelector} onChange={(e) => {
-                  setFunctionSelector(e.target.checked)
-                }} />
-              </div>
-              <div className="checkbox-context">
-                <label htmlFor='logs' style={{ fontSize: 12 }}>logs</label>
-                <input disabled={mevShareDisabled} id='logs' type="checkbox" checked={logs} onChange={(e) => {
-                  setLogs(e.target.checked)
-                }} />
-              </div>
+              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} update={setCalldata} />
+              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} update={setContractAddress} />
+              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} update={setFunctionSelector} />
+              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} update={setLogs} />
             </div>}
           </div>
           <div>
