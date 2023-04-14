@@ -1,4 +1,4 @@
-import React, { FunctionComponent, PropsWithChildren } from 'react'
+import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/matchmaker-ts'
 
@@ -15,16 +15,22 @@ const mungeHints = (auctionHints: HintPreferences) => {
 export interface ProtectButtonOptions extends PropsWithChildren {
   addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
   auctionHints?: HintPreferences, // specify data to share; default is all but calldata
-  targetBuilders?: Array<string>,
-  auctionDisabled?: boolean, // auction enabled unless this is passed
   bundleId?: string,  // id for iterative bundle-building (default: undefined)
   chainId?: number,   // chain to connect to (default: 1)
+  targetBuilders?: Array<string>,
 }
 
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({ addChain, auctionHints, bundleId, chainId, children, targetBuilders }) => {
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
+  addChain,
+  auctionHints,
+  bundleId,
+  chainId,
+  children,
+  targetBuilders,
+}) => {
   const chainIdActual: number = chainId || 1
   const protectUrl =
     chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
