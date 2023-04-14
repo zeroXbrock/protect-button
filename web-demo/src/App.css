@@ -47,8 +47,21 @@ button {
 
 .checkbox-context {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 12px;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+* {
+  font-size: 13px;
 }

@@ -3,6 +3,34 @@ import './App.css'
 import { useMetaMask } from 'metamask-react'
 import ProtectButton, { HintPreferences } from "protect-button"
 
+enum SupportedBuilders {
+  Flashbots = "Flashbots",
+  BlockNative = "BlockNative",
+}
+
+const Checkbox = (
+  { label, id, checked, onChange, disabled, arrangement, orientation }:
+    {
+      disabled?: boolean,
+      label: string,
+      id: string,
+      arrangement?: "vertical" | "horizontal",
+      orientation?: "first" | "last",
+      checked: boolean,
+      onChange: (val: boolean) => void
+    }
+) => {
+  const elements = [
+    <label htmlFor={id} key={0}>{label}</label>,
+    <input id={id} type="checkbox" checked={checked} disabled={disabled} key={1} onChange={(e) => {
+      onChange(e.target.checked)
+    }} />
+  ]
+  return <div className={`checkbox-context ${arrangement}`}>
+    {orientation === "last" ? elements : elements.reverse()}
+  </div>
+}
+
 function App() {
   const { status, connect, addChain } = useMetaMask()
   const [mevShareDisabled, setMevShareDisabled] = useState(false)
@@ -12,6 +40,9 @@ function App() {
   const [contractAddress, setContractAddress] = useState(false)
   const [functionSelector, setFunctionSelector] = useState(false)
   const [logs, setLogs] = useState(false)
+  // builders
+  const [allBuilders, setAllBuilders] = useState(false)
+  const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>([SupportedBuilders.Flashbots])
 
   const getHints = () => mevShareDisabled ?
     ({ calldata: false, contractAddress: false, functionSelector: false, logs: false }) :
@@ -42,13 +73,23 @@ function App() {
         }
   }
 
-  const Checkbox = ({ label, id, checked, update, disabled }: { disabled?: boolean, label: string, id: string, checked: boolean, update: (val: boolean) => void }) => (
-    <div className="checkbox-context">
-      <label htmlFor={id} style={{ fontSize: 12 }}>{label}</label>
-      <input id={id} type="checkbox" checked={checked} disabled={disabled} onChange={(e) => {
-        update(e.target.checked)
-      }} />
-    </div>)
+  const toggleBuilder = (name: string) => {
+    if (selectedBuilders.includes(name)) {
+      setSelectedBuilders(selectedBuilders.filter(builderName => builderName !== name))
+    } else {
+      setSelectedBuilders([...selectedBuilders].concat(name))
+    }
+  }
+
+  const BuilderCheckbox = ({ name }: { name: SupportedBuilders }) => (
+    <Checkbox
+      id={`builder_${name.toLowerCase()}`}
+      label={name}
+      checked={selectedBuilders.includes(name) || allBuilders}
+      disabled={allBuilders}
+      onChange={() => toggleBuilder(name)}
+      orientation='first'
+    />)
 
   return (
     <div className="App">
@@ -61,26 +102,36 @@ function App() {
         )}
         {status === 'connected' && (<>
           <div style={{ display: "flex", alignItems: "stretch" }}>
-            <Checkbox id='mevShareDisabled' label='MEV-Share Disabled' checked={mevShareDisabled} update={setMevShareDisabled} />
+            <Checkbox id='mevShareDisabled' label='MEV-Share Disabled' arrangement='vertical' checked={mevShareDisabled} onChange={setMevShareDisabled} />
             {!mevShareDisabled &&
-              <Checkbox id='experimental' label='Show Experimental Options' checked={showExperimental} update={setShowExperimental} />
+              <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
             }
-            {showExperimental && !mevShareDisabled && <div>
-              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} update={setCalldata} />
-              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} update={setContractAddress} />
-              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} update={setFunctionSelector} />
-              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} update={setLogs} />
+            {showExperimental && !mevShareDisabled && <div className='vertical' style={{ display: "flex", alignItems: "flex-end" }}>
+              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} onChange={setCalldata} orientation='last' />
+              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} orientation='last' onChange={setContractAddress} />
+              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} orientation='last' onChange={setFunctionSelector} />
+              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} onChange={setLogs} orientation='last' />
             </div>}
           </div>
           <div>
-            <code style={{ fontSize: 12 }}>Hints: {(() => {
+            <code>Hints: {(() => {
               const mungedHints = Object.entries(mungeHints() || {}).filter(([_, v]) => !!v).map(([k,]) => k)
               return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)
             })()}</code>
           </div>
-          <div style={{ margin: 32 }}>
-            <ProtectButton addChain={addChain} chainId={1} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>
-            <ProtectButton addChain={addChain} chainId={5} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>
+          <div style={{ marginTop: 32 }}>
+            <h3>Target Builders</h3>
+            <div className="horizontal">
+              <div>
+                <Checkbox id="allBuilders" label="All Builders" checked={allBuilders} onChange={setAllBuilders} />
+              </div>
+              <BuilderCheckbox name={SupportedBuilders.Flashbots} />
+              <BuilderCheckbox name={SupportedBuilders.BlockNative} />
+            </div>
+          </div>
+          <div style={{ marginTop: 32 }}>
+            <ProtectButton addChain={addChain} chainId={1} targetBuilders={(allBuilders ? Object.values(SupportedBuilders) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>
+            <ProtectButton addChain={addChain} chainId={5} targetBuilders={(allBuilders ? Object.values(SupportedBuilders) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>
           </div>
         </>)}
       </header>
