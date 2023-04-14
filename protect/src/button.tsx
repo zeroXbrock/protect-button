@@ -1,25 +1,20 @@
 import React, { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
+import { HintPreferences } from '@flashbots/matchmaker-ts'
 
-type AuctionHints = {
-  calldata?: boolean,
-  contractAddress?: boolean,
-  functionSelector?: boolean,
-  logs?: boolean,
-}
-
-const mungeHints = (auctionHints: AuctionHints) => {
+const mungeHints = (auctionHints: HintPreferences) => {
   return {
     calldata: auctionHints.calldata,
     contract_address: auctionHints.contractAddress,
     function_selector: auctionHints.functionSelector,
     logs: auctionHints.logs,
+    transaction_hash: true, // tx hash is always shared on Flashbots Matchmaker
   }
 }
 
 export interface ProtectButtonOptions extends PropsWithChildren {
   addChain?: (chain: AddEthereumChainParameter) => Promise<void> // callback; from useMetaMask()
-  auctionHints?: AuctionHints, // specify data to share; default is all but calldata
+  auctionHints?: HintPreferences, // specify data to share; default is all but calldata
   auctionDisabled?: boolean, // auction enabled unless this is passed
   bundleId?: string,  // id for iterative bundle-building (default: undefined)
   chainId?: number,   // chain to connect to (default: 1)
@@ -28,18 +23,15 @@ export interface ProtectButtonOptions extends PropsWithChildren {
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addChain, auctionDisabled, auctionHints, bundleId, chainId, children}) => {
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({ addChain, auctionHints, bundleId, chainId, children }) => {
   const chainIdActual: number = chainId || 1
   const protectUrl =
     chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
-    chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
-    "https://rpc.flashbots.net"
+      chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
+        "https://rpc.flashbots.net"
   const rpcUrl = new URL(protectUrl)
 
-  if (auctionDisabled) {
-    rpcUrl.searchParams.append("auction", "disabled")
-  } else if (auctionHints) {
-    rpcUrl.searchParams.append("auction", "enabled")
+  if (auctionHints) {
     for (const entry of Object.entries(mungeHints(auctionHints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
@@ -55,16 +47,15 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addCha
   const connectToProtect = async () => {
     const addChainParams = {
       chainId: `0x${chainIdActual.toString(16)}`,
-      chainName: `Flashbots Protect ${
-        chainIdActual === 1 ? "(Mainnet)" :
+      chainName: `Flashbots Protect ${chainIdActual === 1 ? "(Mainnet)" :
         chainIdActual === 5 ? "(Goerli)" :
-        chainIdActual === 11155111 ? "(Sepolia)" :
-        ` on chain ${chainIdActual}`}`,
+          chainIdActual === 11155111 ? "(Sepolia)" :
+            ` on chain ${chainIdActual}`}`,
       iconUrls: ["https://docs.flashbots.net/img/logo.png"],
       nativeCurrency: {
-          name: "Ethereum",
-          symbol: "ETH",
-          decimals: 18,
+        name: "Ethereum",
+        symbol: "ETH",
+        decimals: 18,
       },
       rpcUrls: [rpcUrl.toString()],
     }
@@ -95,7 +86,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({addCha
   }
 
   return (
-      <button className="flashButton" onClick={connectToProtect}>{children}</button>
+    <button className="flashButton" onClick={connectToProtect}>{children}</button>
   )
 }
 
