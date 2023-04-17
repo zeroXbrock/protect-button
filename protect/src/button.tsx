@@ -1,6 +1,18 @@
 import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
-import { HintPreferences } from '@flashbots/matchmaker-ts'
+// import { HintPreferences } from '@flashbots/matchmaker-ts'
+
+// hard-code this until matchmaker-ts update is available
+export interface HintPreferences {
+  /** Share the calldata of the transaction. (default=false) */
+  calldata?: boolean,
+  /** Share the contract address of the transaction. (default=true) */
+  contractAddress?: boolean,
+  /** Share the 4byte function selector of the transaction. (default=true) */
+  functionSelector?: boolean,
+  /** Share the logs emitted by the transaction. (default=true) */
+  logs?: boolean,
+}
 
 const mungeHints = (hints?: HintPreferences) => {
   const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && !cur, true) : true
