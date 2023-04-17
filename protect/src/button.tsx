@@ -15,7 +15,7 @@ export interface HintPreferences {
 }
 
 const mungeHints = (hints?: HintPreferences) => {
-  const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && !cur, true) : true
+  const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && cur === false, true) : true
   return hints ?
     (allHintsFalse ?
       { // mevshare disabled
