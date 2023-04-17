@@ -19,14 +19,14 @@ const mungeHints = (hints?: HintPreferences) => {
   return hints ?
     (allHintsFalse ?
       { // mevshare disabled
-        transaction_hash: true
+        hash: true
       } :
       { // experimental options
         calldata: hints.calldata,
         contract_address: hints.contractAddress,
         function_selector: hints.functionSelector,
         logs: hints.logs,
-        transaction_hash: true, // tx hash is always shared on Flashbots Matchmaker
+        hash: true, // tx hash is always shared on Flashbots Matchmaker
       })
     : { /* Default (Stable) config; no params */ }
 }
@@ -34,7 +34,7 @@ const mungeHints = (hints?: HintPreferences) => {
 export interface ProtectButtonOptions extends PropsWithChildren {
   /** Callback from useMetaMask() */
   addChain?: (chain: AddEthereumChainParameter) => Promise<void>
-  /** Specify data to share; default is [Stable config](#TODO-link-to-docs) */
+  /** Specify data to share; if undefined, uses default [Stable config](https://docs.flashbots.net/flashbots-protect/rpc/mev-share#stable-configuration) */
   auctionHints?: HintPreferences,
   /** ID for iterative bundle-building (default: undefined) */
   bundleId?: string,

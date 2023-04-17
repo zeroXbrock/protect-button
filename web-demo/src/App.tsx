@@ -61,7 +61,7 @@ function App() {
   const mungeHints = () => {
     const hints = getHints()
     return mevShareDisabled ? {
-      transaction_hash: true,
+      hash: true,
     } :
       noHintsSelected(hints) ? {} :
         hints && {
@@ -69,7 +69,7 @@ function App() {
           contract_address: hints.contractAddress,
           function_selector: hints.functionSelector,
           logs: hints.logs,
-          transaction_hash: true, // tx hash is always shared on Flashbots Matchmaker
+          hash: true, // tx hash is always shared on Flashbots Matchmaker
         }
   }
 
