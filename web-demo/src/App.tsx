@@ -1,11 +1,21 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 import { useMetaMask } from 'metamask-react'
 import ProtectButton, { HintPreferences } from "protect-button"
 
-enum SupportedBuilders {
-  Flashbots = "Flashbots",
-  BlockNative = "BlockNative",
+const getSupportedBuilders = async () => {
+  // hardcode until spec release, then use raw.github
+  return [
+    {
+      name: "flashbots",
+      rpc: "rpc.flashbots.net",
+    },
+  ]
+}
+
+type Builder = {
+  name: string,
+  rpc: string,
 }
 
 const Checkbox = (
@@ -42,7 +52,8 @@ function App() {
   const [logs, setLogs] = useState(false)
   // builders
   const [allBuilders, setAllBuilders] = useState(false)
-  const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>([SupportedBuilders.Flashbots])
+  const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
+  const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
   const getHints = () => mevShareDisabled ?
     ({ calldata: false, contractAddress: false, functionSelector: false, logs: false }) :
@@ -53,6 +64,15 @@ function App() {
   const noHintsSelected = (hints?: HintPreferences) => {
     return hints ? Object.values(hints).reduce((acc, curr) => acc && curr === false, true) : true
   }
+
+  useEffect(() => {
+    async function init() {
+      if (!curatedBuilders) {
+        setCuratedBuilders(await getSupportedBuilders())
+      }
+    }
+    init()
+  })
 
   /** Converts hints into format that the API would receive.
    *
@@ -69,7 +89,7 @@ function App() {
           contract_address: hints.contractAddress,
           function_selector: hints.functionSelector,
           logs: hints.logs,
-          hash: true, // tx hash is always shared on Flashbots Matchmaker
+          hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
         }
   }
 
@@ -81,7 +101,7 @@ function App() {
     }
   }
 
-  const BuilderCheckbox = ({ name }: { name: SupportedBuilders }) => (
+  const BuilderCheckbox = ({ name }: { name: string }) => (
     <Checkbox
       id={`builder_${name.toLowerCase()}`}
       label={name}
@@ -126,13 +146,12 @@ function App() {
               <div>
                 <Checkbox id="allBuilders" label="All Builders" checked={allBuilders} onChange={setAllBuilders} />
               </div>
-              <BuilderCheckbox name={SupportedBuilders.Flashbots} />
-              <BuilderCheckbox name={SupportedBuilders.BlockNative} />
+              {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
             </div>
           </div>
           <div style={{ marginTop: 32 }}>
-            <ProtectButton addChain={addChain} chainId={1} targetBuilders={(allBuilders ? Object.values(SupportedBuilders) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>
-            <ProtectButton addChain={addChain} chainId={5} targetBuilders={(allBuilders ? Object.values(SupportedBuilders) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>

@@ -26,7 +26,7 @@ const mungeHints = (hints?: HintPreferences) => {
         contract_address: hints.contractAddress,
         function_selector: hints.functionSelector,
         logs: hints.logs,
-        hash: true, // tx hash is always shared on Flashbots Matchmaker
+        hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
       })
     : { /* Default (Stable) config; no params */ }
 }
