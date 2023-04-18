@@ -55,12 +55,15 @@ function App() {
   const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
   const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
-  const getHints = () => mevShareDisabled ?
-    ({ calldata: false, contractAddress: false, functionSelector: false, logs: false }) :
-    showExperimental ?
-      ({ calldata, contractAddress, functionSelector, logs }) :
-      undefined
-
+  const getHints = () => {
+    const rawHints = { calldata, contractAddress, functionSelector, logs }
+    return mevShareDisabled ?
+      ({ calldata: false, contractAddress: false, functionSelector: false, logs: false }) :
+      showExperimental ?
+        noHintsSelected(rawHints) ? undefined :
+          rawHints :
+        undefined
+  }
   const noHintsSelected = (hints?: HintPreferences) => {
     return hints ? Object.values(hints).reduce((acc, curr) => acc && curr === false, true) : true
   }
@@ -140,7 +143,7 @@ function App() {
               return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)
             })()}</code>
           </div>
-          <div style={{ marginTop: 32 }}>
+          {showExperimental && !mevShareDisabled && <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
             <div className="horizontal">
               <div>
@@ -148,10 +151,10 @@ function App() {
               </div>
               {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
             </div>
-          </div>
+          </div>}
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental && !mevShareDisabled ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental && !mevShareDisabled ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
