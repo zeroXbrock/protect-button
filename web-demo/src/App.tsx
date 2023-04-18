@@ -43,7 +43,6 @@ const Checkbox = (
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
-  const [mevShareDisabled, setMevShareDisabled] = useState(false)
   const [showExperimental, setShowExperimental] = useState(false)
   // hints
   const [calldata, setCalldata] = useState(false)
@@ -57,12 +56,7 @@ function App() {
 
   const getHints = () => {
     const rawHints = { calldata, contractAddress, functionSelector, logs }
-    return mevShareDisabled ?
-      ({ calldata: false, contractAddress: false, functionSelector: false, logs: false }) :
-      showExperimental ?
-        noHintsSelected(rawHints) ? undefined :
-          rawHints :
-        undefined
+    return showExperimental ? rawHints : undefined
   }
   const noHintsSelected = (hints?: HintPreferences) => {
     return hints ? Object.values(hints).reduce((acc, curr) => acc && curr === false, true) : true
@@ -83,17 +77,14 @@ function App() {
   */
   const mungeHints = () => {
     const hints = getHints()
-    return mevShareDisabled ? {
-      hash: true,
+    return showExperimental && hints ? {
+      calldata: hints.calldata,
+      contract_address: hints.contractAddress,
+      function_selector: hints.functionSelector,
+      logs: hints.logs,
+      hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
     } :
-      noHintsSelected(hints) ? {} :
-        hints && {
-          calldata: hints.calldata,
-          contract_address: hints.contractAddress,
-          function_selector: hints.functionSelector,
-          logs: hints.logs,
-          hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-        }
+      {}
   }
 
   const toggleBuilder = (name: string) => {
@@ -125,25 +116,22 @@ function App() {
         )}
         {status === 'connected' && (<>
           <h2>MEV-Share Settings</h2>
-          <div style={{ display: "flex", alignItems: "stretch" }}>
-            <Checkbox id='mevShareDisabled' label='MEV-Share Disabled' arrangement='vertical' checked={mevShareDisabled} onChange={setMevShareDisabled} />
-            {!mevShareDisabled &&
-              <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
-            }
-            {showExperimental && !mevShareDisabled && <div className='vertical' style={{ display: "flex", alignItems: "flex-start" }}>
-              <Checkbox id='calldata' label='calldata' disabled={mevShareDisabled} checked={calldata} onChange={setCalldata} orientation='first' />
-              <Checkbox id='contractAddress' label='contract address' disabled={mevShareDisabled} checked={contractAddress} orientation='first' onChange={setContractAddress} />
-              <Checkbox id='functionSelector' label='function selector' disabled={mevShareDisabled} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
-              <Checkbox id='logs' label='logs' disabled={mevShareDisabled} checked={logs} onChange={setLogs} orientation='first' />
-            </div>}
-          </div>
+          <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
+          {/* <div style={{ display: "flex", alignItems: "stretch" }}> */}
+          {showExperimental && <div className='horizontal'>
+            <Checkbox id='calldata' label='calldata' checked={calldata} onChange={setCalldata} orientation='first' />
+            <Checkbox id='contractAddress' label='contract address' checked={contractAddress} orientation='first' onChange={setContractAddress} />
+            <Checkbox id='functionSelector' label='function selector' checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
+            <Checkbox id='logs' label='logs' checked={logs} onChange={setLogs} orientation='first' />
+          </div>}
+          {/* </div> */}
           <div style={{ marginTop: 13 }}>
             <code>Hints: {(() => {
               const mungedHints = Object.entries(mungeHints() || {}).filter(([_, v]) => !!v).map(([k,]) => k)
               return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)
             })()}</code>
           </div>
-          {showExperimental && !mevShareDisabled && <div style={{ marginTop: 32 }}>
+          {showExperimental && <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
             <div className="horizontal">
               <div>
@@ -153,8 +141,8 @@ function App() {
             </div>
           </div>}
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental && !mevShareDisabled ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental && !mevShareDisabled ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
