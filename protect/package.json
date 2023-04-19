@@ -1,6 +1,6 @@
 {
   "name": "protect-button",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "main": "build/index.js",
   "license": "MIT",
   "author": {
