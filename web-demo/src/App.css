@@ -44,3 +44,32 @@ button {
   color: #f7ffd6;
   width: 240px;
 }
+
+.checkbox-context {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: #f7ffd633;
+}
+
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+* {
+  font-size: 13px;
+}
+
+h2 {
+  font-size: 14px;
+}

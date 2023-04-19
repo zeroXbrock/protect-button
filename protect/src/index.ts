@@ -1,6 +1,5 @@
-import FlashbotsProtectButton, { ProtectButtonOptions } from './button'
+import FlashbotsProtectButton from './button'
 
-export {
-    ProtectButtonOptions
-}
+export { HintPreferences, ProtectButtonOptions } from './button'
+
 export default FlashbotsProtectButton
