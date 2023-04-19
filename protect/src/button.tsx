@@ -23,7 +23,7 @@ export interface ProtectButtonOptions extends PropsWithChildren {
   /** Callback from useMetaMask() */
   addChain?: (chain: AddEthereumChainParameter) => Promise<void>
   /** Specify data to share; if undefined, uses default [Stable config](https://docs.flashbots.net/flashbots-protect/rpc/mev-share#stable-configuration) */
-  auctionHints?: HintPreferences,
+  hints?: HintPreferences,
   /** ID for iterative bundle-building (default: undefined) */
   bundleId?: string,
   /** Chain to connect to (default: 1) */
@@ -37,7 +37,7 @@ export interface ProtectButtonOptions extends PropsWithChildren {
  */
 const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   addChain,
-  auctionHints,
+  hints,
   bundleId,
   chainId,
   children,
@@ -50,8 +50,8 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
         "https://rpc.flashbots.net"
   const rpcUrl = new URL(protectUrl)
 
-  if (auctionHints) {
-    for (const entry of Object.entries(mungeHints(auctionHints))) {
+  if (hints) {
+    for (const entry of Object.entries(mungeHints(hints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
         rpcUrl.searchParams.append("hint", hintName)
@@ -116,3 +116,4 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
 }
 
 export default FlashbotsProtectButton
+export { HintPreferences } from "@flashbots/matchmaker-ts"

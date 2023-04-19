@@ -54,12 +54,9 @@ function App() {
   const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
   const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
-  const getHints = () => {
+  const getHints = (): HintPreferences | undefined => {
     const rawHints = { calldata, contractAddress, functionSelector, logs }
     return showExperimental ? rawHints : undefined
-  }
-  const noHintsSelected = (hints?: HintPreferences) => {
-    return hints ? Object.values(hints).reduce((acc, curr) => acc && curr === false, true) : true
   }
 
   useEffect(() => {
@@ -141,8 +138,8 @@ function App() {
             </div>
           </div>}
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} auctionHints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
