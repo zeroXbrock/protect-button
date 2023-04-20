@@ -29,7 +29,7 @@ export interface ProtectButtonOptions extends PropsWithChildren {
   /** Chain to connect to (default: 1) */
   chainId?: number,
   /** Selected builders that are permitted to build blocks using the client's transactions. */
-  targetBuilders?: Array<string>,
+  builders?: Array<string>,
 }
 
 /**
@@ -41,7 +41,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   bundleId,
   chainId,
   children,
-  targetBuilders,
+  builders,
 }) => {
   const chainIdActual: number = chainId || 1
   const protectUrl =
@@ -63,9 +63,9 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
     rpcUrl.searchParams.append("bundle", bundleId)
   }
 
-  if (targetBuilders) {
-    for (const builder of targetBuilders) {
-      rpcUrl.searchParams.append("targetBuilder", builder)
+  if (builders) {
+    for (const builder of builders) {
+      rpcUrl.searchParams.append("builder", builder)
     }
   }
 
