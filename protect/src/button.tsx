@@ -33,18 +33,18 @@ export interface ProtectButtonOptions extends PropsWithChildren {
 }
 
 export const generateRpcUrl = ({
-  chainIdActual,
+  chainId,
   hints,
   bundleId,
   builders
 }: {
-  chainIdActual?: number;
+  chainId?: number;
   hints?: HintPreferences;
   bundleId?: string;
   builders?: string[];
 }) => {
-  const protectUrl = chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
-    chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
+  const protectUrl = chainId === 5 ? "https://rpc-goerli.flashbots.net" :
+    chainId === 11155111 ? "https://rpc-sepolia.flashbots.net" :
       "https://rpc.flashbots.net"
   const rpcUrl = new URL(protectUrl)
 
@@ -82,7 +82,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   builders,
 }) => {
   const chainIdActual: number = chainId || 1
-  const rpcUrl = generateRpcUrl(chainIdActual, hints, bundleId, builders)
+  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders });
 
   const connectToProtect = async () => {
     const addChainParams = {
