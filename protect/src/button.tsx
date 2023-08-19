@@ -32,22 +32,20 @@ export interface ProtectButtonOptions extends PropsWithChildren {
   builders?: Array<string>,
 }
 
-/**
- * Button that connects Metamask to Flashbots Protect when it's clicked.
- */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
-  addChain,
+export const generateRpcUrl = ({
+  chainId,
   hints,
   bundleId,
-  chainId,
-  children,
-  builders,
+  builders
+}: {
+  chainId?: number;
+  hints?: HintPreferences;
+  bundleId?: string;
+  builders?: string[];
 }) => {
-  const chainIdActual: number = chainId || 1
-  const protectUrl =
-    chainIdActual === 5 ? "https://rpc-goerli.flashbots.net" :
-      chainIdActual === 11155111 ? "https://rpc-sepolia.flashbots.net" :
-        "https://rpc.flashbots.net"
+  const protectUrl = chainId === 5 ? "https://rpc-goerli.flashbots.net" :
+    chainId === 11155111 ? "https://rpc-sepolia.flashbots.net" :
+      "https://rpc.flashbots.net"
   const rpcUrl = new URL(protectUrl)
 
   if (hints) {
@@ -68,6 +66,23 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
       rpcUrl.searchParams.append("builder", builder)
     }
   }
+  return rpcUrl
+}
+
+
+/**
+ * Button that connects Metamask to Flashbots Protect when it's clicked.
+ */
+const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
+  addChain,
+  hints,
+  bundleId,
+  chainId,
+  children,
+  builders,
+}) => {
+  const chainIdActual: number = chainId || 1
+  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders });
 
   const connectToProtect = async () => {
     const addChainParams = {
