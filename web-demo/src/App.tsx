@@ -138,8 +138,8 @@ function App() {
             </div>
           </div>}
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} targetBuilders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
