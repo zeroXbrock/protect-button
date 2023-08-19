@@ -1,4 +1,25 @@
-# Getting Started with Create React App
+# protect button web demo
+
+## setup
+
+Build the protect button:
+
+```sh
+# in project root
+cd protect
+yarn install
+yarn build
+```
+
+Then run the demo:
+
+```sh
+cd ../web-demo
+npm i
+npm start
+```
+
+---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
