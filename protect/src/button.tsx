@@ -1,6 +1,6 @@
 import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
-import { HintPreferences } from '@flashbots/matchmaker-ts'
+import { HintPreferences } from '@flashbots/mev-share-client'
 
 const mungeHints = (hints?: HintPreferences) => {
   const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && cur === false, true) : true
@@ -14,6 +14,7 @@ const mungeHints = (hints?: HintPreferences) => {
         contract_address: hints.contractAddress,
         function_selector: hints.functionSelector,
         logs: hints.logs,
+        default_logs: hints.defaultLogs,
         hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
       })
     : { /* Default (Stable) config; no params */ }
