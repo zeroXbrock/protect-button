@@ -31,10 +31,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@flashbots/mev-share-client@^0.7.7":
-  version "0.7.7"
-  resolved "https://registry.yarnpkg.com/@flashbots/mev-share-client/-/mev-share-client-0.7.7.tgz#74965a759cc101e1ea400a51b39ebc99777d3063"
-  integrity sha512-7NXriOI5ZS29rYaIIlDDgwD6IL/j0PCI/cUTeu7lnKzXUVvFXYrdE4X1SDVCEruU7zPFR3DGvnOn0sFBro2g2g==
+"@flashbots/mev-share-client@^0.7.10":
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/@flashbots/mev-share-client/-/mev-share-client-0.7.10.tgz#f86383dd91bf3bb6d6451456ce418229814009eb"
+  integrity sha512-jK2ZejfPzNY4du4pKnu9PTxMikbgHOKhfpXgAe6g/QeDyzz1yzfGLIffxa6CaqM0ygyyUMIPs3h2pgL3MzA4tg==
   dependencies:
     async-mutex "^0.4.0"
     axios "^1.3.4"
