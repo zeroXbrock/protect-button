@@ -132,4 +132,4 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
 }
 
 export default FlashbotsProtectButton
-export { HintPreferences } from "@flashbots/matchmaker-ts"
+export { HintPreferences } from "@flashbots/mev-share-client"
