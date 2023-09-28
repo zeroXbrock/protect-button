@@ -3,7 +3,7 @@ import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/matchmaker-ts'
 
 const mungeHints = (hints?: HintPreferences) => {
-  const allHintsFalse = hints ? Object.values(hints).reduce((prv, cur) => prv && cur === false, true) : true
+  const allHintsFalse = hints ? Object.values(hints).every(hint => hint === false) : true
   return hints ?
     (allHintsFalse ?
       { // mevshare disabled
@@ -52,7 +52,7 @@ export const generateRpcUrl = ({
     for (const entry of Object.entries(mungeHints(hints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
-        rpcUrl.searchParams.append("hint", hintName)
+        rpcUrl.searchParams.append("hint", hintName.toLowerCase())
       }
     }
   }
@@ -63,7 +63,7 @@ export const generateRpcUrl = ({
 
   if (builders) {
     for (const builder of builders) {
-      rpcUrl.searchParams.append("builder", builder)
+      rpcUrl.searchParams.append("builder", builder.toLowerCase())
     }
   }
   return rpcUrl
