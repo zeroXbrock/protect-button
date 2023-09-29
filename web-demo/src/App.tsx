@@ -72,16 +72,22 @@ function App() {
    *
    * For display purposes only -- ProtectButton handles this internally.
   */
-  const mungeHints = () => {
-    const hints = getHints()
-    return showExperimental && hints ? {
-      calldata: hints.calldata,
-      contract_address: hints.contractAddress,
-      function_selector: hints.functionSelector,
-      logs: hints.logs,
-      hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-    } :
-      {}
+  const mungeHints = (hints?: HintPreferences) => {
+    const allHintsFalse = hints ? Object.values(hints).every(hint => !hint) : true
+    return hints ?
+      (allHintsFalse ?
+        { // mevshare disabled
+          hash: true
+        } :
+        {
+          calldata: hints.calldata,
+          contract_address: hints.contractAddress,
+          function_selector: hints.functionSelector,
+          logs: hints.logs,
+          default_logs: hints.defaultLogs,
+          hash: false, // (tx/bundle) hash is always shared on Flashbots Matchmaker
+        })
+      : { /* Default (Stable) config; no params */ }
   }
 
   const toggleBuilder = (name: string) => {
