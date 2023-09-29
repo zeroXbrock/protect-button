@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import { useMetaMask } from 'metamask-react'
-import ProtectButton, { HintPreferences } from "protect-button"
+import ProtectButton, { HintPreferences, generateRpcUrl } from "protect-button"
 
 const getSupportedBuilders = async () => {
   // hardcode until spec release, then use raw.github
   return [
     {
       name: "flashbots",
+      rpc: "rpc.flashbots.net",
+    },
+    {
+      name: "flashbots1",
+      rpc: "rpc.flashbots.net",
+    },
+    {
+      name: "flashbots2",
       rpc: "rpc.flashbots.net",
     },
   ]
@@ -43,20 +51,23 @@ const Checkbox = (
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
-  const [showExperimental, setShowExperimental] = useState(false)
   // hints
   const [calldata, setCalldata] = useState(false)
   const [contractAddress, setContractAddress] = useState(false)
   const [functionSelector, setFunctionSelector] = useState(false)
   const [logs, setLogs] = useState(false)
+  const [defaultLogs, setDefaultLogs] = useState(false)
+  const [hash, setHash] = useState(false)
   // builders
   const [allBuilders, setAllBuilders] = useState(false)
   const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
   const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
   const getHints = (): HintPreferences | undefined => {
-    const rawHints = { calldata, contractAddress, functionSelector, logs }
-    return showExperimental ? rawHints : undefined
+    const rawHints: HintPreferences = { calldata, contractAddress, functionSelector, logs, defaultLogs, txHash: hash }
+    console.log(generateRpcUrl({ hints: rawHints }).toString())
+    console.log(rawHints)
+    return rawHints
   }
 
   useEffect(() => {
@@ -67,28 +78,6 @@ function App() {
     }
     init()
   })
-
-  /** Converts hints into format that the API would receive.
-   *
-   * For display purposes only -- ProtectButton handles this internally.
-  */
-  const mungeHints = (hints?: HintPreferences) => {
-    const allHintsFalse = hints ? Object.values(hints).every(hint => !hint) : true
-    return hints ?
-      (allHintsFalse ?
-        { // mevshare disabled
-          hash: true
-        } :
-        {
-          calldata: hints.calldata,
-          contract_address: hints.contractAddress,
-          function_selector: hints.functionSelector,
-          logs: hints.logs,
-          default_logs: hints.defaultLogs,
-          hash: false, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-        })
-      : { /* Default (Stable) config; no params */ }
-  }
 
   const toggleBuilder = (name: string) => {
     if (selectedBuilders.includes(name)) {
@@ -108,6 +97,9 @@ function App() {
       orientation='first'
     />)
 
+  const hints = getHints()
+  const url = generateRpcUrl({ hints }).toString()
+
   return (
     <div className="App">
       <header className="App-header">
@@ -119,22 +111,19 @@ function App() {
         )}
         {status === 'connected' && (<>
           <h2>MEV-Share Settings</h2>
-          <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
           {/* <div style={{ display: "flex", alignItems: "stretch" }}> */}
-          {showExperimental && <div className='horizontal'>
+          <div className='horizontal'>
             <Checkbox id='calldata' label='calldata' checked={calldata} onChange={setCalldata} orientation='first' />
             <Checkbox id='contractAddress' label='contract address' checked={contractAddress} orientation='first' onChange={setContractAddress} />
             <Checkbox id='functionSelector' label='function selector' checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
             <Checkbox id='logs' label='logs' checked={logs} onChange={setLogs} orientation='first' />
-          </div>}
-          {/* </div> */}
-          <div style={{ marginTop: 13 }}>
-            <code>Hints: {(() => {
-              const mungedHints = Object.entries(mungeHints() || {}).filter(([_, v]) => !!v).map(([k,]) => k)
-              return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)
-            })()}</code>
+            <Checkbox id='defaultLogs' label='default' checked={defaultLogs} onChange={setDefaultLogs} orientation='first' />
+            <Checkbox id='fullPrivafcy' label='full privacy' checked={hash} onChange={setHash} orientation='first' />
           </div>
-          {showExperimental && <div style={{ marginTop: 32 }}>
+          <div style={{ marginTop: 13 }}>
+            <code>{JSON.stringify(hints)}</code>
+          </div>
+          <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
             <div className="horizontal">
               <div>
@@ -142,10 +131,21 @@ function App() {
               </div>
               {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
             </div>
-          </div>}
+          </div>
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders &&
+              <ProtectButton addChain={addChain} chainId={1}
+                builders={
+                  (allBuilders ?
+                    curatedBuilders.map(b => b.name.toLowerCase())
+                    : selectedBuilders)
+                    .map(b => b.toLowerCase())
+                }
+                hints={hints}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={(allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders).map(b => b.toLowerCase())} hints={hints}>Connect to Protect (Goerli)</ProtectButton>}
+          </div>
+          <div style={{ padding: 20 }}>
+            <code>url: {url}</code>
           </div>
         </>)}
       </header>

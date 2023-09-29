@@ -11,13 +11,14 @@ export const mungeHintsForRpcUrl = (hints?: HintPreferences) => {
     set hash to undefined so it's removed from the URL.
  */
   const hashImplied = hints?.calldata || hints?.contractAddress || hints?.functionSelector || hints?.logs || hints?.defaultLogs
+  console.log("hash implied", hashImplied)
   return {
     calldata: hints?.calldata,
     contract_address: hints?.contractAddress,
     function_selector: hints?.functionSelector,
     logs: hints?.logs,
     default_logs: hints?.defaultLogs,
-    hash: hashImplied ? undefined : hints?.txHash,
+    hash: hashImplied ? false : hints?.txHash,
   }
 }
 

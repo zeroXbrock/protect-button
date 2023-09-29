@@ -6,7 +6,6 @@
   "author": {
     "name": "zeroXbrock"
   },
-  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/zeroXbrock/protect-button"
@@ -23,7 +22,7 @@
     "release-it": "^15.8.0",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^4"
   },
   "dependencies": {
     "@flashbots/mev-share-client": "^0.7.10"
@@ -34,7 +33,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "ts-mocha -p tsconfig.json ./tests/**/*.spec.ts --ignore node_modules",
+    "test": "ts-mocha -p tsconfig.json ./tests/**/*.spec.ts",
     "release": "echo \"run the following:\nnpx release-it\""
   }
 }
