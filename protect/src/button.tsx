@@ -70,6 +70,19 @@ export const generateRpcUrl = ({
   return rpcUrl
 }
 
+const chainName = (chainId: number) => {
+  switch (chainId) {
+    case 1:
+      return "Mainnet"
+    case 5:
+      return "Goerli"
+    case 11155111:
+      return "Sepolia"
+    default:
+      return `Chain ${chainId}`
+  }
+}
+
 
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
@@ -88,10 +101,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   const connectToProtect = async () => {
     const addChainParams = {
       chainId: `0x${chainIdActual.toString(16)}`,
-      chainName: `Flashbots Protect ${chainIdActual === 1 ? "(Mainnet)" :
-        chainIdActual === 5 ? "(Goerli)" :
-          chainIdActual === 11155111 ? "(Sepolia)" :
-            ` on chain ${chainIdActual}`}`,
+      chainName: `Flashbots Protect (${chainName(chainIdActual)})`,
       iconUrls: ["https://docs.flashbots.net/img/logo.png"],
       nativeCurrency: {
         name: "Ethereum",
@@ -132,4 +142,3 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
 }
 
 export default FlashbotsProtectButton
-export { HintPreferences } from "@flashbots/mev-share-client"
