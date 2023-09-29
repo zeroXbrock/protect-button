@@ -48,12 +48,16 @@ function App() {
   const [contractAddress, setContractAddress] = useState(false)
   const [functionSelector, setFunctionSelector] = useState(false)
   const [logs, setLogs] = useState(false)
+  const [maxPrivacy, setMaxPrivacy] = useState(false)
   // builders
   const [allBuilders, setAllBuilders] = useState(false)
   const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
   const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
   const getHints = (): HintPreferences | undefined => {
+    if (maxPrivacy) return {
+      txHash: true,
+    }
     return { calldata, contractAddress, functionSelector, logs }
   }
 
@@ -97,14 +101,13 @@ function App() {
         )}
         {status === 'connected' && (<>
           <h2>MEV-Share Settings</h2>
-          {/* <div style={{ display: "flex", alignItems: "stretch" }}> */}
           <div className='horizontal'>
-            <Checkbox id='calldata' label='calldata' checked={calldata} onChange={setCalldata} orientation='first' />
-            <Checkbox id='contractAddress' label='contract address' checked={contractAddress} orientation='first' onChange={setContractAddress} />
-            <Checkbox id='functionSelector' label='function selector' checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
-            <Checkbox id='logs' label='logs' checked={logs} onChange={setLogs} orientation='first' />
+            <Checkbox id='calldata' label='calldata' disabled={maxPrivacy} checked={calldata} onChange={setCalldata} orientation='first' />
+            <Checkbox id='contractAddress' label='contract address' disabled={maxPrivacy} checked={contractAddress} orientation='first' onChange={setContractAddress} />
+            <Checkbox id='functionSelector' label='function selector' disabled={maxPrivacy} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
+            <Checkbox id='logs' label='logs' disabled={maxPrivacy} checked={logs} onChange={setLogs} orientation='first' />
+            <Checkbox id='maxPrivacy' label='Max Privacy' checked={maxPrivacy} onChange={setMaxPrivacy} orientation='first' />
           </div>
-          {/* </div> */}
           <div style={{ marginTop: 13 }}>
             <code>Hints: {generateRpcUrl({ hints }).toString()}</code>
           </div>

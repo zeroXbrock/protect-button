@@ -2,22 +2,23 @@ import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/mev-share-client'
 
-const mungeHints = (hints?: HintPreferences) => {
-  const allHintsFalse = hints ? Object.values(hints).every(hint => hint === false) : true
-  return hints ?
-    (allHintsFalse ?
-      { // mevshare disabled
-        hash: true
-      } :
-      { // experimental options
-        calldata: hints.calldata,
-        contract_address: hints.contractAddress,
-        function_selector: hints.functionSelector,
-        logs: hints.logs,
-        default_logs: hints.defaultLogs,
-        hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-      })
-    : { /* Default (Stable) config; no params */ }
+export const mungeHintsForRpcUrl = (hints?: HintPreferences) => {
+  /*
+    `hash` is always shared on the backend.
+    We only need to specify it if we don't want default hints shared.
+
+    If other hints are specified, `hash` is implied. In that case we
+    set hash to undefined so it's removed from the URL.
+ */
+  const hashImplied = hints?.calldata || hints?.contractAddress || hints?.functionSelector || hints?.logs || hints?.defaultLogs
+  return {
+    calldata: hints?.calldata,
+    contract_address: hints?.contractAddress,
+    function_selector: hints?.functionSelector,
+    logs: hints?.logs,
+    default_logs: hints?.defaultLogs,
+    hash: hashImplied ? false : hints?.txHash,
+  }
 }
 
 export interface ProtectButtonOptions extends PropsWithChildren {
@@ -50,7 +51,7 @@ export const generateRpcUrl = ({
   const rpcUrl = new URL(protectUrl)
 
   if (hints) {
-    for (const entry of Object.entries(mungeHints(hints))) {
+    for (const entry of Object.entries(mungeHintsForRpcUrl(hints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
         rpcUrl.searchParams.append("hint", hintName.toLowerCase())
