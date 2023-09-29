@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import { useMetaMask } from 'metamask-react'
-import ProtectButton, { HintPreferences } from "protect-button"
+import ProtectButton, { HintPreferences, generateRpcUrl } from "protect-button"
 
 const getSupportedBuilders = async () => {
   // hardcode until spec release, then use raw.github
@@ -43,20 +43,22 @@ const Checkbox = (
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
-  const [showExperimental, setShowExperimental] = useState(false)
   // hints
   const [calldata, setCalldata] = useState(false)
   const [contractAddress, setContractAddress] = useState(false)
   const [functionSelector, setFunctionSelector] = useState(false)
   const [logs, setLogs] = useState(false)
+  const [maxPrivacy, setMaxPrivacy] = useState(false)
   // builders
   const [allBuilders, setAllBuilders] = useState(false)
   const [selectedBuilders, setSelectedBuilders] = useState<Array<string>>(["flashbots"])
   const [curatedBuilders, setCuratedBuilders] = useState<Array<Builder>>()
 
   const getHints = (): HintPreferences | undefined => {
-    const rawHints = { calldata, contractAddress, functionSelector, logs }
-    return showExperimental ? rawHints : undefined
+    if (maxPrivacy) return {
+      txHash: true,
+    }
+    return { calldata, contractAddress, functionSelector, logs }
   }
 
   useEffect(() => {
@@ -67,22 +69,6 @@ function App() {
     }
     init()
   })
-
-  /** Converts hints into format that the API would receive.
-   *
-   * For display purposes only -- ProtectButton handles this internally.
-  */
-  const mungeHints = () => {
-    const hints = getHints()
-    return showExperimental && hints ? {
-      calldata: hints.calldata,
-      contract_address: hints.contractAddress,
-      function_selector: hints.functionSelector,
-      logs: hints.logs,
-      hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-    } :
-      {}
-  }
 
   const toggleBuilder = (name: string) => {
     if (selectedBuilders.includes(name)) {
@@ -102,6 +88,8 @@ function App() {
       orientation='first'
     />)
 
+  const hints = getHints()
+
   return (
     <div className="App">
       <header className="App-header">
@@ -113,22 +101,17 @@ function App() {
         )}
         {status === 'connected' && (<>
           <h2>MEV-Share Settings</h2>
-          <Checkbox id='experimental' label='Show Experimental Options' arrangement='vertical' checked={showExperimental} onChange={setShowExperimental} />
-          {/* <div style={{ display: "flex", alignItems: "stretch" }}> */}
-          {showExperimental && <div className='horizontal'>
-            <Checkbox id='calldata' label='calldata' checked={calldata} onChange={setCalldata} orientation='first' />
-            <Checkbox id='contractAddress' label='contract address' checked={contractAddress} orientation='first' onChange={setContractAddress} />
-            <Checkbox id='functionSelector' label='function selector' checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
-            <Checkbox id='logs' label='logs' checked={logs} onChange={setLogs} orientation='first' />
-          </div>}
-          {/* </div> */}
-          <div style={{ marginTop: 13 }}>
-            <code>Hints: {(() => {
-              const mungedHints = Object.entries(mungeHints() || {}).filter(([_, v]) => !!v).map(([k,]) => k)
-              return Object.keys(mungedHints).length === 0 ? "Stable Configuration" : JSON.stringify(mungedHints)
-            })()}</code>
+          <div className='horizontal'>
+            <Checkbox id='calldata' label='calldata' disabled={maxPrivacy} checked={calldata} onChange={setCalldata} orientation='first' />
+            <Checkbox id='contractAddress' label='contract address' disabled={maxPrivacy} checked={contractAddress} orientation='first' onChange={setContractAddress} />
+            <Checkbox id='functionSelector' label='function selector' disabled={maxPrivacy} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
+            <Checkbox id='logs' label='logs' disabled={maxPrivacy} checked={logs} onChange={setLogs} orientation='first' />
+            <Checkbox id='maxPrivacy' label='Max Privacy' checked={maxPrivacy} onChange={setMaxPrivacy} orientation='first' />
           </div>
-          {showExperimental && <div style={{ marginTop: 32 }}>
+          <div style={{ marginTop: 13 }}>
+            <code>Hints: {generateRpcUrl({ hints }).toString()}</code>
+          </div>
+          <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
             <div className="horizontal">
               <div>
@@ -136,10 +119,10 @@ function App() {
               </div>
               {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
             </div>
-          </div>}
+          </div>
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={(showExperimental ? (allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders) : []).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>

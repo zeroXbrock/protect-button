@@ -2,22 +2,23 @@ import { FunctionComponent, PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/mev-share-client'
 
-const mungeHints = (hints?: HintPreferences) => {
-  const allHintsFalse = hints ? Object.values(hints).every(hint => hint === false) : true
-  return hints ?
-    (allHintsFalse ?
-      { // mevshare disabled
-        hash: true
-      } :
-      { // experimental options
-        calldata: hints.calldata,
-        contract_address: hints.contractAddress,
-        function_selector: hints.functionSelector,
-        logs: hints.logs,
-        default_logs: hints.defaultLogs,
-        hash: true, // (tx/bundle) hash is always shared on Flashbots Matchmaker
-      })
-    : { /* Default (Stable) config; no params */ }
+export const mungeHintsForRpcUrl = (hints?: HintPreferences) => {
+  /*
+    `hash` is always shared on the backend.
+    We only need to specify it if we don't want default hints shared.
+
+    If other hints are specified, `hash` is implied. In that case we
+    set hash to undefined so it's removed from the URL.
+ */
+  const hashImplied = hints?.calldata || hints?.contractAddress || hints?.functionSelector || hints?.logs || hints?.defaultLogs
+  return {
+    calldata: hints?.calldata,
+    contract_address: hints?.contractAddress,
+    function_selector: hints?.functionSelector,
+    logs: hints?.logs,
+    default_logs: hints?.defaultLogs,
+    hash: hashImplied ? false : hints?.txHash,
+  }
 }
 
 export interface ProtectButtonOptions extends PropsWithChildren {
@@ -50,7 +51,7 @@ export const generateRpcUrl = ({
   const rpcUrl = new URL(protectUrl)
 
   if (hints) {
-    for (const entry of Object.entries(mungeHints(hints))) {
+    for (const entry of Object.entries(mungeHintsForRpcUrl(hints))) {
       const [hintName, hintEnabled] = entry
       if (hintEnabled) {
         rpcUrl.searchParams.append("hint", hintName.toLowerCase())
@@ -68,6 +69,19 @@ export const generateRpcUrl = ({
     }
   }
   return rpcUrl
+}
+
+const chainName = (chainId: number) => {
+  switch (chainId) {
+    case 1:
+      return "Mainnet"
+    case 5:
+      return "Goerli"
+    case 11155111:
+      return "Sepolia"
+    default:
+      return `Chain ${chainId}`
+  }
 }
 
 
@@ -88,10 +102,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   const connectToProtect = async () => {
     const addChainParams = {
       chainId: `0x${chainIdActual.toString(16)}`,
-      chainName: `Flashbots Protect ${chainIdActual === 1 ? "(Mainnet)" :
-        chainIdActual === 5 ? "(Goerli)" :
-          chainIdActual === 11155111 ? "(Sepolia)" :
-            ` on chain ${chainIdActual}`}`,
+      chainName: `Flashbots Protect (${chainName(chainIdActual)})`,
       iconUrls: ["https://docs.flashbots.net/img/logo.png"],
       nativeCurrency: {
         name: "Ethereum",
@@ -132,4 +143,3 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
 }
 
 export default FlashbotsProtectButton
-export { HintPreferences } from "@flashbots/mev-share-client"
