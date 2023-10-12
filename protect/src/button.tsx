@@ -32,19 +32,17 @@ export interface ProtectButtonOptions extends PropsWithChildren {
   chainId?: number,
   /** Selected builders that are permitted to build blocks using the client's transactions. */
   builders?: Array<string>,
+  /** `fast` mode enables all supported builders implicitly. Setting `fast` will override `builders`. */
+  fast?: boolean,
 }
 
 export const generateRpcUrl = ({
   chainId,
   hints,
   bundleId,
-  builders
-}: {
-  chainId?: number;
-  hints?: HintPreferences;
-  bundleId?: string;
-  builders?: string[];
-}) => {
+  builders,
+  fast,
+}: ProtectButtonOptions) => {
   const protectUrl = chainId === 5 ? "https://rpc-goerli.flashbots.net" :
     chainId === 11155111 ? "https://rpc-sepolia.flashbots.net" :
       "https://rpc.flashbots.net"
@@ -63,7 +61,9 @@ export const generateRpcUrl = ({
     rpcUrl.searchParams.append("bundle", bundleId)
   }
 
-  if (builders) {
+  if (fast) {
+    rpcUrl.pathname += "fast"
+  } else if (builders) {
     for (const builder of builders) {
       rpcUrl.searchParams.append("builder", builder.toLowerCase())
     }
@@ -95,6 +95,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   chainId,
   children,
   builders,
+  fast,
 }) => {
   const chainIdActual: number = chainId || 1
   const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders });
