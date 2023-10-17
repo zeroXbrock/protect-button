@@ -1,4 +1,4 @@
-import { FunctionComponent, PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/mev-share-client'
 
@@ -46,7 +46,7 @@ export const generateRpcUrl = ({
   const protectUrl = chainId === 5 ? "https://rpc-goerli.flashbots.net" :
     chainId === 11155111 ? "https://rpc-sepolia.flashbots.net" :
       "https://rpc.flashbots.net"
-  const rpcUrl = new URL(protectUrl)
+  let rpcUrl = new URL(protectUrl)
 
   if (hints) {
     for (const entry of Object.entries(mungeHintsForRpcUrl(hints))) {
@@ -88,7 +88,7 @@ const chainName = (chainId: number) => {
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
+const FlashbotsProtectButton = ({
   addChain,
   hints,
   bundleId,
@@ -96,11 +96,10 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   children,
   builders,
   fast,
-}) => {
-  const chainIdActual: number = chainId || 1
-  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders, fast });
-
+}: ProtectButtonOptions) => {
   const connectToProtect = async () => {
+    const chainIdActual: number = chainId || 1
+    const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders, fast });
     const addChainParams = {
       chainId: `0x${chainIdActual.toString(16)}`,
       chainName: `Flashbots Protect (${chainName(chainIdActual)})`,
@@ -138,9 +137,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
     }
   }
 
-  return (
-    <button className="flashButton" onClick={connectToProtect}>{children}</button>
-  )
+  return <button className="flashButton" onClick={connectToProtect}>{children}</button>
 }
 
 export default FlashbotsProtectButton

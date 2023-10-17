@@ -43,6 +43,8 @@ const Checkbox = (
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
+  // fast mode
+  const [fast, setFast] = useState(false)
   // hints
   const [calldata, setCalldata] = useState(false)
   const [contractAddress, setContractAddress] = useState(false)
@@ -107,9 +109,10 @@ function App() {
             <Checkbox id='functionSelector' label='function selector' disabled={maxPrivacy} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
             <Checkbox id='logs' label='logs' disabled={maxPrivacy} checked={logs} onChange={setLogs} orientation='first' />
             <Checkbox id='maxPrivacy' label='Max Privacy' checked={maxPrivacy} onChange={setMaxPrivacy} orientation='first' />
+            <Checkbox id='fast' label='Fast' checked={fast} onChange={setFast} orientation='first' />
           </div>
           <div style={{ marginTop: 13 }}>
-            <code>Hints: {generateRpcUrl({ hints }).toString()}</code>
+            <code>URL: {generateRpcUrl({ hints, fast }).toString()}</code>
           </div>
           <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
