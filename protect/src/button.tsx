@@ -136,13 +136,13 @@ const FlashbotsProtectButton = ({
   children,
   builders,
   fast,
-}: ProtectButtonOptions) => (<button className="flashButton" onClick={() => connectToProtect({
+}: ProtectButtonOptions) => <button className="flashButton" onClick={() => connectToProtect({
   addChain,
   hints,
   bundleId,
   chainId,
   builders,
   fast,
-})}>{children}</button>)
+})}>{children}</button>
 
 export default FlashbotsProtectButton
