@@ -1,4 +1,4 @@
-import { FunctionComponent, PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import { AddEthereumChainParameter } from 'metamask-react/lib/metamask-context'
 import { HintPreferences } from '@flashbots/mev-share-client'
 
@@ -32,23 +32,21 @@ export interface ProtectButtonOptions extends PropsWithChildren {
   chainId?: number,
   /** Selected builders that are permitted to build blocks using the client's transactions. */
   builders?: Array<string>,
+  /** `fast` mode enables all supported builders implicitly. Setting `fast` will override `builders`. */
+  fast?: boolean,
 }
 
 export const generateRpcUrl = ({
   chainId,
   hints,
   bundleId,
-  builders
-}: {
-  chainId?: number;
-  hints?: HintPreferences;
-  bundleId?: string;
-  builders?: string[];
-}) => {
+  builders,
+  fast,
+}: ProtectButtonOptions) => {
   const protectUrl = chainId === 5 ? "https://rpc-goerli.flashbots.net" :
     chainId === 11155111 ? "https://rpc-sepolia.flashbots.net" :
       "https://rpc.flashbots.net"
-  const rpcUrl = new URL(protectUrl)
+  let rpcUrl = new URL(protectUrl)
 
   if (hints) {
     for (const entry of Object.entries(mungeHintsForRpcUrl(hints))) {
@@ -63,7 +61,9 @@ export const generateRpcUrl = ({
     rpcUrl.searchParams.append("bundle", bundleId)
   }
 
-  if (builders) {
+  if (fast) {
+    rpcUrl.pathname += "fast"
+  } else if (builders) {
     for (const builder of builders) {
       rpcUrl.searchParams.append("builder", builder.toLowerCase())
     }
@@ -84,62 +84,65 @@ const chainName = (chainId: number) => {
   }
 }
 
+const connectToProtect = async (options: ProtectButtonOptions) => {
+  const chainIdActual: number = options.chainId || 1
+  const rpcUrl = generateRpcUrl(options);
+  const addChainParams = {
+    chainId: `0x${chainIdActual.toString(16)}`,
+    chainName: `Flashbots Protect (${chainName(chainIdActual)})`,
+    iconUrls: ["https://docs.flashbots.net/img/logo.png"],
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: [rpcUrl.toString()],
+  }
+  if (options.addChain) {
+    try {
+      options.addChain(addChainParams)
+    } catch (err) {
+      // handle "add" error
+      console.error("addChain failed")
+      throw err
+    }
+  } else if ("ethereum" in window) {
+    // do it manually with window.ethereum
+    try {
+      const ethereum: any = window.ethereum
+      await ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [addChainParams],
+      })
+    } catch (err) {
+      // handle "add" error
+      console.error("addChain failed")
+      throw err
+    }
+  } else {
+    throw new Error("ethereum provider not found")
+  }
+}
+
 
 /**
  * Button that connects Metamask to Flashbots Protect when it's clicked.
  */
-const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
+const FlashbotsProtectButton = ({
   addChain,
   hints,
   bundleId,
   chainId,
   children,
   builders,
-}) => {
-  const chainIdActual: number = chainId || 1
-  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders });
-
-  const connectToProtect = async () => {
-    const addChainParams = {
-      chainId: `0x${chainIdActual.toString(16)}`,
-      chainName: `Flashbots Protect (${chainName(chainIdActual)})`,
-      iconUrls: ["https://docs.flashbots.net/img/logo.png"],
-      nativeCurrency: {
-        name: "Ethereum",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      rpcUrls: [rpcUrl.toString()],
-    }
-    if (addChain) {
-      try {
-        addChain(addChainParams)
-      } catch (err) {
-        // handle "add" error
-        console.error("addChain failed")
-        throw err
-      }
-    } else if ("ethereum" in window) {
-      // do it manually with window.ethereum
-      try {
-        const ethereum: any = window.ethereum
-        await ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [addChainParams],
-        })
-      } catch (err) {
-        // handle "add" error
-        console.error("addChain failed")
-        throw err
-      }
-    } else {
-      throw new Error("ethereum provider not found")
-    }
-  }
-
-  return (
-    <button className="flashButton" onClick={connectToProtect}>{children}</button>
-  )
-}
+  fast,
+}: ProtectButtonOptions) => <button className="flashButton" onClick={() => connectToProtect({
+  addChain,
+  hints,
+  bundleId,
+  chainId,
+  builders,
+  fast,
+})}>{children}</button>
 
 export default FlashbotsProtectButton

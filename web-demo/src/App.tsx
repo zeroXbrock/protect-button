@@ -43,6 +43,8 @@ const Checkbox = (
 
 function App() {
   const { status, connect, addChain } = useMetaMask()
+  // fast mode
+  const [fast, setFast] = useState(false)
   // hints
   const [calldata, setCalldata] = useState(false)
   const [contractAddress, setContractAddress] = useState(false)
@@ -107,9 +109,10 @@ function App() {
             <Checkbox id='functionSelector' label='function selector' disabled={maxPrivacy} checked={functionSelector} orientation='first' onChange={setFunctionSelector} />
             <Checkbox id='logs' label='logs' disabled={maxPrivacy} checked={logs} onChange={setLogs} orientation='first' />
             <Checkbox id='maxPrivacy' label='Max Privacy' checked={maxPrivacy} onChange={setMaxPrivacy} orientation='first' />
+            <Checkbox id='fast' label='Fast' checked={fast} onChange={setFast} orientation='first' />
           </div>
           <div style={{ marginTop: 13 }}>
-            <code>Hints: {generateRpcUrl({ hints }).toString()}</code>
+            <code>URL: {generateRpcUrl({ hints, fast }).toString()}</code>
           </div>
           <div style={{ marginTop: 32 }}>
             <h3>Target Builders</h3>
@@ -117,12 +120,12 @@ function App() {
               <div>
                 <Checkbox id="allBuilders" label="All Builders" checked={allBuilders} onChange={setAllBuilders} />
               </div>
-              {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
+              {curatedBuilders?.map(builder => <BuilderCheckbox key={builder.name} name={builder.name} />)}
             </div>
           </div>
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()} fast={fast}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()} fast={fast}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
