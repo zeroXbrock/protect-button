@@ -120,12 +120,12 @@ function App() {
               <div>
                 <Checkbox id="allBuilders" label="All Builders" checked={allBuilders} onChange={setAllBuilders} />
               </div>
-              {curatedBuilders?.map(builder => <BuilderCheckbox name={builder.name} />)}
+              {curatedBuilders?.map(builder => <BuilderCheckbox key={builder.name} name={builder.name} />)}
             </div>
           </div>
           <div style={{ marginTop: 32 }}>
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Mainnet)</ProtectButton>}
-            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()}>Connect to Protect (Goerli)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={1} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()} fast={fast}>Connect to Protect (Mainnet)</ProtectButton>}
+            {curatedBuilders && <ProtectButton addChain={addChain} chainId={5} builders={((allBuilders ? curatedBuilders.map(b => b.name.toLowerCase()) : selectedBuilders)).map(b => b.toLowerCase())} hints={getHints()} fast={fast}>Connect to Protect (Goerli)</ProtectButton>}
           </div>
         </>)}
       </header>
