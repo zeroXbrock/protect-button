@@ -98,7 +98,7 @@ const FlashbotsProtectButton: FunctionComponent<ProtectButtonOptions> = ({
   fast,
 }) => {
   const chainIdActual: number = chainId || 1
-  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders });
+  const rpcUrl = generateRpcUrl({ chainId: chainIdActual, hints, bundleId, builders, fast });
 
   const connectToProtect = async () => {
     const addChainParams = {
